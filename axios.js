@@ -9,7 +9,7 @@ app.all('*', function (req, res, next) {
     res.header('Content-Type', 'application/json;charset=utf-8');
     next();
 });
-
+ 
 app.get('/getTest', function(request, response){
     data = {
         'FrontEnd':'前端',

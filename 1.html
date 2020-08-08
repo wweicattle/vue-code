@@ -73,6 +73,7 @@
                 this.interceptors.request.handlers.forEach(interceptor => {
                     chain.unshift(interceptor.fullfield, interceptor.rejected)
                 })
+                 
 
                 // 响应拦截
                 this.interceptors.response.handlers.forEach(interceptor => {
