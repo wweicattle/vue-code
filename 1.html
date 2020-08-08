@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id="button">
+        click me!come on .....
+    </button>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.20.0-0/axios.js"></script>
+    <script>
+        class Axios {
+            constructor(props) {
+                let that = this;
+                // 请求方式为get，post，put，delete
+                const methodsArr = ['get', 'delete', 'head', 'options', 'put', 'patch', 'post'];
+
+                methodsArr.forEach(met => {
+                    // 具体请求方法的处理
+                    Axios.prototype[met] = function () {
+                        console.log(that)
+                        if (['get', 'delete', 'head', 'options'].includes(met)) { // 2个参数(url[, config])
+                            return that.request({
+                                method: met,
+                                url: arguments[0],
+                                ...arguments[1] || {}
+                            })
+                        } else { // 3个参数(url[,data[,config]])
+                            return that.request({
+                                method: met,
+                                url: arguments[0],
+                                data: arguments[1] || {},
+                                ...arguments[2] || {}
+                            })
+                        }
+
+                    }
+                })
+                this.interceptors = {
+                    request: new InterceptorsManage,
+                    response: new InterceptorsManage
+                }
+            }
+
+            // 发送请求，具体由ajax请求
+            sendAjax(config) {
+                return new Promise(resolve => {
+                    const {
+                        url = '', method = 'get', data = {}
+                    } = config;
+                    // 发送ajax请求
+                    const xhr = new XMLHttpRequest();
+                    xhr.open(method, url, true);
+                    xhr.onload = function () {
+                        console.log(xhr.responseText)
+                        resolve(xhr.responseText);
+                    };
+                    xhr.send(data);
+                })
+            }
+
+
+            // 请求过程中的拦截，以及响应，最后返回响应的数据
+            request(config) {
+                // 拦截器和请求组装队列
+                let chain = [this.sendAjax.bind(this), undefined] // 成对出现的，失败回调暂时不处理
+
+                // 请求拦截
+                this.interceptors.request.handlers.forEach(interceptor => {
+                    chain.unshift(interceptor.fullfield, interceptor.rejected)
+                })
+
+                // 响应拦截
+                this.interceptors.response.handlers.forEach(interceptor => {
+                    chain.push(interceptor.fullfield, interceptor.rejected)
+                })
+
+                // 执行队列，每次执行一对，并给promise赋最新的值 
+                // 这步骤最为关键就是把所有的请求拦截的promise与响应拦截的promise进行包揽在一个数组中
+                let promise = Promise.resolve(config);
+                while (chain.length > 0) {
+                   
+                    promise = promise.then(chain.shift(), chain.shift())
+                }
+                return promise;
+            }
+        }
+        // 请求与拦截的类
+        class InterceptorsManage {
+            constructor() {
+                this.handlers = [];
+            }
+
+            use(fullfield, rejected) {
+                this.handlers.push({
+                    fullfield,
+                    rejected
+                })
+            }
+        }
+
+        // 克隆对象到实例上，当所有的axios上的私有对象。
+        function cloneObj(obj, objClone) {
+            for (let i in objClone) {
+                obj[i] = objClone[i];
+            }
+            return obj;
+        }
+
+        // 创建一个axios的实例
+        function CreateAxiosFn() {
+            let axios = new Axios();
+            let req = axios.request.bind(axios);
+            cloneObj(req, Axios.prototype)
+            cloneObj(req, axios)
+            return req;
+        }
+
+        button.onclick = function () {
+            let axios = CreateAxiosFn();
+            // 添加请求拦截器，开始resolve与reject状态进行收集到handlers中
+            axios.interceptors.request.use(function (config) {
+                // 在发送请求之前做些什么
+                config.method = "get";
+                console.log("被我请求拦截器拦截了，哈哈:", config);
+                return config;
+            }, function (error) {
+                // 对请求错误做些什么
+                return Promise.reject(error);
+            });
+
+            // 添加响应拦截器，开始resolve与reject状态进行收集到handlers中
+            axios.interceptors.response.use(function (response) {
+                // 对响应数据做点什么
+                console.log("被我响应拦截拦截了，哈哈 ");
+                response = {
+                    message: "响应数据被我替换了，啊哈哈哈"
+                }
+                return response;
+            }, function (error) {
+                // 对响应错误做点什么
+                console.log("错了吗");
+                return Promise.reject(error);
+            });
+
+            // 开始触发的导火索，开始进行请求，之后开始进行收集所有的拦截函数，之后遍历执行。
+            axios.get('http://localhost:5000/getTest').then(res => {
+                console.log('getAxios 成功响应', res);
+            })
+        }
+    </script>
+</body>
+
+</html>
