@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model="ddf">
+        <input type="text" v-model="mess1">
+        <div>{{message1}}</div>
+        {{mess1}}{{message1}}
+        <div>
+            <span>{{message}}{{ddf}}</span>
+        </div>
+        <div></div>
+    </div>
+    <script src="./component.js" ></script>
+    <script>
+        var r = new Vue({
+            el: "#app",
+            data: {
+                ddf: "wuwei",
+                message1: [43, 545, 455],
+                mess1: "sdfsf",
+                message: "434",
+                // sd: "sds",
+                message2: "dsfsf"
+            },
+        })
+      
+
+    </script>
+
+</body>
+
+</html>
