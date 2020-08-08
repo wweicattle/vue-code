@@ -40,6 +40,8 @@
 
                     }
                 })
+                
+                // 这是请求拦截与响应的操作
                 this.interceptors = {
                     request: new InterceptorsManage,
                     response: new InterceptorsManage
@@ -87,7 +89,7 @@
                    
                     promise = promise.then(chain.shift(), chain.shift())
                 }
-                return promise;
+                return promise; 
             }
         }
         // 请求与拦截的类
