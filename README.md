@@ -2,7 +2,10 @@
 
 ## Project setup
 ```
-源码的实现从/src/routes/中查看
+1、实现一个简易的Vue模板编译，响应式原理，双向绑定，请查看!smallVue目录
+2、Vue-router源码的实现从VueRouter文件目录中查看
+3、Vuex源码的实现从vuex文件目录中查看
+4、axios源码从axios文件目录中查看
 
 npm install
 ```

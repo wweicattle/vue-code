@@ -1,5 +1,5 @@
 import Vue from "vue";
-import vuex from "./../Vuex"
+import vuex from "../Vuex"
 
 Vue.use(vuex);
 let store = new vuex.Store({
